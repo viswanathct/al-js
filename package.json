@@ -27,5 +27,9 @@
   "homepage": "https://github.com/viswanathct/al-js#readme",
   "devDependencies": {
     "jest": "^24.7.1"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageDirectory": "./.jest-coverage"
   }
 }
