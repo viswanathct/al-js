@@ -1,0 +1,31 @@
+{
+  "name": "assembly-js",
+  "version": "0.0.1",
+  "description": "A simple set of utililties to help with building assembly lines in JS.",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "jest --no-cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viswanathct/assembly-js.git"
+  },
+  "keywords": [
+    "build",
+    "assembly-line",
+    "utility",
+    "FP",
+    "functional-programming",
+    "unix-pipes",
+    "builder-pattern"
+  ],
+  "author": "Viswanath. Ct",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/viswanathct/assembly-js/issues"
+  },
+  "homepage": "https://github.com/viswanathct/assembly-js#readme",
+  "devDependencies": {
+    "jest": "^24.7.1"
+  }
+}
