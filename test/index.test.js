@@ -6,19 +6,19 @@ describe('Functionality of the package', () => {
 
 	const Expectations = {
 
-		line: {
+		flow: {
 			type: Function,
 		},
 
-		fix: {
+		forgive: {
 			type: Function,
 		},
 
-		invert: {
+		flip: {
 			type: Function,
 		},
 
-		stop: {
+		fail: {
 			type: Function,
 		},
 
@@ -26,7 +26,7 @@ describe('Functionality of the package', () => {
 			type: Function,
 		},
 
-		check: {
+		fix: {
 			type: Function,
 		},
 
