@@ -6,6 +6,21 @@
 
 * Assembly lines help in implementing complex flows, in a manner -- easy to comprehend and maintain.
 
+## Example
+```js
+pass(Orders, flow(
+	verifyStock,
+	verifyPayment,
+	dispatch,
+	sendMail,
+));
+```
+
+## Setup
+```sh
+$ sh ./setup.sh
+```
+
 ## Keys
 
 * Every input to a flow is passed to the functions sequentially.
