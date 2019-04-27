@@ -10,7 +10,11 @@ const testMembers = (module, Expectations) =>
 				config.test && await config.test(member);
 			}));
 
+const expectMockCalls = (fn) => (expectation) =>
+	expect(fn.mock.calls).toEqual(expectation);
+
 module.exports = {
 
 	testMembers,
+	expectMockCalls,
 }

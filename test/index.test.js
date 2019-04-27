@@ -1,52 +1,55 @@
-const { testMembers, peek } = require("./helpers");
+const { testMembers, expectMockCalls } = require("./helpers");
 
 describe('Functionality of the package', () => {
 
-	const assembly = require('../src');
-	const { fail } = assembly;
+	const assemblyLine = require('../src');
+
+	/* Helpers */
+	const { fail } = assemblyLine;
 	const pass = () => true;
 
+	/* Mocks */
+	const data = Symbol();
+	const mRet = { one: Symbol(), two: Symbol() };
+	const mFlow = {
+		one: jest.fn().mockReturnValue(mRet.one),
+		two: jest.fn().mockReturnValue(mRet.two),
+	};
+
+	/* Config */
 	const Expectations = {
 
 		flow: {
 			type: Function,
 			returns: Function,
-			test: async (fn) => {
-				const flow1 = jest.fn();
-				const ret2 = Symbol();
-				const flow2 = jest.fn().mockReturnValue(ret2);
-				const data = Symbol();
-
-				expect(await fn(flow1, flow2)(data)).toEqual(ret2);
-				expect(flow1).toHaveBeenCalledTimes(1);
-				expect(flow1).toBeCalledWith(data);
-				expect(flow2).toHaveBeenCalledTimes(1);
-				expect(flow2).toBeCalledWith(data);
+			test: async (testedFn) => {
+				expect(await testedFn(mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
+				expectMockCalls(mFlow.one)([[data]]);
+				expectMockCalls(mFlow.two)([[data]]);
 
 				jest.clearAllMocks();
 
-				expect(await fn(flow1, fail, flow2)(data)).toEqual(false);
-				expect(flow1).toHaveBeenCalledTimes(1);
-				expect(flow1).toBeCalledWith(data);
-				expect(flow2).toHaveBeenCalledTimes(0);
+				expect(await testedFn(mFlow.one, fail, mFlow.two)(data)).toEqual(false);
+				expectMockCalls(mFlow.one)([[data]]);
+				expectMockCalls(mFlow.two)([]);
 			},
 		},
 
 		forgive: {
 			type: Function,
 			returns: Function,
-			test: async (fn) => {
-				expect(await fn(fail)()).toEqual(undefined);
-				expect(await fn(pass)()).toEqual(true);
+			test: async (testedFn) => {
+				expect(await testedFn(fail)()).toEqual(undefined);
+				expect(await testedFn(pass)()).toEqual(true);
 			},
 		},
 
 		flip: {
 			type: Function,
 			returns: Function,
-			test: async (fn) => {
-				expect(await fn(fail)()).toEqual(undefined);
-				expect(await fn(pass)()).toEqual(false);
+			test: async (testedFn) => {
+				expect(await testedFn(fail)()).toEqual(undefined);
+				expect(await testedFn(pass)()).toEqual(false);
 			},
 		},
 
@@ -57,86 +60,69 @@ describe('Functionality of the package', () => {
 
 		fork: {
 			type: Function,
-			test: async (fn) => {
+			test: async (testedFn) => {
 				const defaultRet = Symbol();
 				const defaultFlow = jest.fn().mockReturnValue(defaultRet);
-				const forkerdRet = Symbol();
-				const forkedFlow = jest.fn().mockReturnValue(forkerdRet);
-				const data = Symbol();
+				const forkedRet = Symbol();
+				const forkedFlow = jest.fn().mockReturnValue(forkedRet);
 
-				expect(await fn(pass, defaultFlow, forkedFlow)(data)).toEqual(defaultRet);
-				expect(defaultFlow).toHaveBeenCalledTimes(1);
-				expect(defaultFlow).toBeCalledWith(data);
-				expect(forkedFlow).toHaveBeenCalledTimes(0);
+				expect(await testedFn(pass, defaultFlow, forkedFlow)(data)).toEqual(defaultRet);
+				expectMockCalls(defaultFlow)([[data]]);
+				expectMockCalls(forkedFlow)([]);
 
 				jest.clearAllMocks();
 
-				expect(await fn(fail, defaultFlow, forkedFlow)(data)).toEqual(forkerdRet);
-				expect(defaultFlow).toHaveBeenCalledTimes(0);
-				expect(forkedFlow).toHaveBeenCalledTimes(1);
-				expect(forkedFlow).toBeCalledWith(data);
+				expect(await testedFn(fail, defaultFlow, forkedFlow)(data)).toEqual(forkedRet);
+				expectMockCalls(defaultFlow)([]);
+				expectMockCalls(forkedFlow)([[data]]);
 			},
 		},
 
 		fix: {
 			type: Function,
-			test: async (fn) => {
-				const ret1 = Symbol();
-				const flow1 = jest.fn().mockReturnValue(ret1);
-				const ret2 = Symbol();
-				const flow2 = jest.fn().mockReturnValue(ret2);
-				const data = Symbol();
-
-				expect(await fn(pass, flow1)(data)).toEqual(undefined);
-				expect(flow1).toHaveBeenCalledTimes(0);
+			test: async (testedFn) => {
+				expect(await testedFn(pass, mFlow.one)(data)).toEqual(undefined);
+				expect(mFlow.one).toHaveBeenCalledTimes(0);
 
 				jest.clearAllMocks();
 
-				expect(await fn(fail, flow1, flow2)(data)).toEqual(ret2);
-				expect(flow1).toHaveBeenCalledTimes(1);
-				expect(flow1).toBeCalledWith(data);
-				expect(flow2).toHaveBeenCalledTimes(1);
-				expect(flow1).toBeCalledWith(data);
+				expect(await testedFn(fail, mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
+				expectMockCalls(mFlow.one)([[data]]);
+				expectMockCalls(mFlow.two)([[data]]);
 			},
 		},
 
 		choose: {
 			type: Function,
-			test: async (fn) => {
-				const ret1 = Symbol();
-				const flow1 = jest.fn().mockReturnValue(ret1);
-				const ret2 = Symbol();
-				const flow2 = jest.fn().mockReturnValue(ret2);
-				const choiceFn = (choice) => choice ? flow1 : flow2;
+			test: async (testedFn) => {
+				const choiceFn = (choice) => choice ? mFlow.one : mFlow.two;
 
-				expect(await fn(choiceFn)(true)).toEqual(ret1);
-				expect(flow1).toHaveBeenCalledTimes(1);
-				expect(flow2).toHaveBeenCalledTimes(0);
+				expect(await testedFn(choiceFn)(true)).toEqual(mRet.one);
+				expect(mFlow.one).toHaveBeenCalledTimes(1);
+				expect(mFlow.two).toHaveBeenCalledTimes(0);
 
 				jest.clearAllMocks();
 
-				expect(await fn(choiceFn)(false)).toEqual(ret2);
-				expect(flow1).toHaveBeenCalledTimes(0);
-				expect(flow2).toHaveBeenCalledTimes(1);
+				expect(await testedFn(choiceFn)(false)).toEqual(mRet.two);
+				expect(mFlow.one).toHaveBeenCalledTimes(0);
+				expect(mFlow.two).toHaveBeenCalledTimes(1);
 			},
 		},
 
 		pass: {
 			type: Function,
-			test: async (fn) => {
-				const ret1 = Symbol();
-				const flow1 = jest.fn().mockReturnValue(ret1);
-				const ret2 = Symbol();
-				const flow2 = jest.fn().mockReturnValue(ret2);
-				const data = [1, 2];
+			test: async (testedFn) => {
+				const items = [Symbol(), Symbol()];
+				const expectation = [[items[0]], [items[1]]];
 
-				expect(await fn(data, flow1, flow2)).toEqual(ret2);
-				expect(flow1.mock.calls).toEqual([[1], [2]]);
-				expect(flow2.mock.calls).toEqual([[1], [2]]);
+				expect(await testedFn(items, mFlow.one, mFlow.two)).toEqual(mRet.two);
+				expectMockCalls(mFlow.one)(expectation);
+				expectMockCalls(mFlow.two)(expectation);
 			},
 		},
 	};
 
 	/* Main */
-	testMembers(assembly, Expectations);
+	beforeEach(() => jest.clearAllMocks());
+	testMembers(assemblyLine, Expectations);
 });
