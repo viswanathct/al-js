@@ -1,12 +1,13 @@
 const { testMembers, expectMockCalls } = require("./helpers");
 
-describe('Functionality of the package', () => {
+describe('Functionality of the package.', () => {
 
-	const assemblyLine = require('../src');
+	/* Test Targets */
+	const { flow, forgive, flip, fail,
+		fork, fix, choose, pass, } = require('../src');
 
 	/* Helpers */
-	const { fail } = assemblyLine;
-	const pass = () => true;
+	const succeed = () => true;
 
 	/* Mocks */
 	const data = Symbol();
@@ -16,113 +17,91 @@ describe('Functionality of the package', () => {
 		two: jest.fn().mockReturnValue(mRet.two),
 	};
 
-	/* Config */
-	const Expectations = {
-
-		flow: {
-			type: Function,
-			returns: Function,
-			test: async (testedFn) => {
-				expect(await testedFn(mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
-				expectMockCalls(mFlow.one)([[data]]);
-				expectMockCalls(mFlow.two)([[data]]);
-
-				jest.clearAllMocks();
-
-				expect(await testedFn(mFlow.one, fail, mFlow.two)(data)).toEqual(false);
-				expectMockCalls(mFlow.one)([[data]]);
-				expectMockCalls(mFlow.two)([]);
-			},
-		},
-
-		forgive: {
-			type: Function,
-			returns: Function,
-			test: async (testedFn) => {
-				expect(await testedFn(fail)()).toEqual(undefined);
-				expect(await testedFn(pass)()).toEqual(true);
-			},
-		},
-
-		flip: {
-			type: Function,
-			returns: Function,
-			test: async (testedFn) => {
-				expect(await testedFn(fail)()).toEqual(undefined);
-				expect(await testedFn(pass)()).toEqual(false);
-			},
-		},
-
-		fail: {
-			type: Function,
-			test: (fn) => expect(fn()).toEqual(false),
-		},
-
-		fork: {
-			type: Function,
-			test: async (testedFn) => {
-				const defaultRet = Symbol();
-				const defaultFlow = jest.fn().mockReturnValue(defaultRet);
-				const forkedRet = Symbol();
-				const forkedFlow = jest.fn().mockReturnValue(forkedRet);
-
-				expect(await testedFn(pass, defaultFlow, forkedFlow)(data)).toEqual(defaultRet);
-				expectMockCalls(defaultFlow)([[data]]);
-				expectMockCalls(forkedFlow)([]);
-
-				jest.clearAllMocks();
-
-				expect(await testedFn(fail, defaultFlow, forkedFlow)(data)).toEqual(forkedRet);
-				expectMockCalls(defaultFlow)([]);
-				expectMockCalls(forkedFlow)([[data]]);
-			},
-		},
-
-		fix: {
-			type: Function,
-			test: async (testedFn) => {
-				expect(await testedFn(pass, mFlow.one)(data)).toEqual(undefined);
-				expect(mFlow.one).toHaveBeenCalledTimes(0);
-
-				jest.clearAllMocks();
-
-				expect(await testedFn(fail, mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
-				expectMockCalls(mFlow.one)([[data]]);
-				expectMockCalls(mFlow.two)([[data]]);
-			},
-		},
-
-		choose: {
-			type: Function,
-			test: async (testedFn) => {
-				const choiceFn = (choice) => choice ? mFlow.one : mFlow.two;
-
-				expect(await testedFn(choiceFn)(true)).toEqual(mRet.one);
-				expect(mFlow.one).toHaveBeenCalledTimes(1);
-				expect(mFlow.two).toHaveBeenCalledTimes(0);
-
-				jest.clearAllMocks();
-
-				expect(await testedFn(choiceFn)(false)).toEqual(mRet.two);
-				expect(mFlow.one).toHaveBeenCalledTimes(0);
-				expect(mFlow.two).toHaveBeenCalledTimes(1);
-			},
-		},
-
-		pass: {
-			type: Function,
-			test: async (testedFn) => {
-				const items = [Symbol(), Symbol()];
-				const expectation = [[items[0]], [items[1]]];
-
-				expect(await testedFn(items, mFlow.one, mFlow.two)).toEqual(mRet.two);
-				expectMockCalls(mFlow.one)(expectation);
-				expectMockCalls(mFlow.two)(expectation);
-			},
-		},
-	};
-
-	/* Main */
+	/* Setup */
 	beforeEach(() => jest.clearAllMocks());
-	testMembers(assemblyLine, Expectations);
+
+	/* Tests */
+	test('"flow" should call sub-flows in sequence.', async () => {
+		expect(await flow(mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
+		expectMockCalls(mFlow.one)([[data]]);
+		expectMockCalls(mFlow.two)([[data]]);
+	});
+
+	test('"flow" should stop and return false when a sub-flow fails.', async () => {
+		expect(await flow(mFlow.one, fail, mFlow.two)(data)).toEqual(false);
+		expectMockCalls(mFlow.one)([[data]]);
+		expectMockCalls(mFlow.two)([]);
+	});
+
+	test('"forgive" should negate failures.', async () => {
+		expect(await forgive(fail)()).toEqual(undefined);
+		expect(await forgive(succeed)()).toEqual(true);
+	});
+
+	test('"flip" should negate bot successes and failures.', async () => {
+		expect(await flip(fail)()).toEqual(undefined);
+		expect(await flip(succeed)()).toEqual(false);
+	});
+
+	test('"fail" should return false, to break the flow.', () => {
+
+		expect(fail()).toEqual(false);
+	});
+
+	test('"fork" should continue with the default-flow, when the forkerFn succeeds.', async () => {
+		const defaultFlow = mFlow.one;
+		const defaultRet = mRet.one;
+		const forkedFlow = mFlow.two;
+
+		expect(await fork(succeed, defaultFlow, forkedFlow)(data)).toEqual(defaultRet);
+		expectMockCalls(defaultFlow)([[data]]);
+		expectMockCalls(forkedFlow)([]);
+	});
+
+	test('"fork" should continue with the forked-flow, when the forkerFn fails.', async () => {
+		const defaultFlow = mFlow.one;
+		const forkedFlow = mFlow.two;
+		const forkedRet = mRet.two;
+
+		expect(await fork(fail, defaultFlow, forkedFlow)(data)).toEqual(forkedRet);
+		expectMockCalls(defaultFlow)([]);
+		expectMockCalls(forkedFlow)([[data]]);
+	});
+
+	test('"fix" should not continue with the "resolving flow" when the fixed-function succeeds.', async () => {
+		const fixedFn = succeed;
+		const resolvingFlow = mFlow.one;
+
+		expect(await fix(fixedFn, resolvingFlow)(data)).toEqual(undefined);
+		expect(resolvingFlow).toHaveBeenCalledTimes(0);
+	});
+
+	test('"fix" should invoke the "resolving flow" when the fixed-function fails.', async () => {
+		expect(await fix(fail, mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
+		expectMockCalls(mFlow.one)([[data]]);
+		expectMockCalls(mFlow.two)([[data]]);
+	});
+
+	test('"choose" should choose the flow based on the return value of the choiceFn.', async () => {
+		const choiceFn = (choice) => choice ? mFlow.one : mFlow.two;
+
+		expect(await choose(choiceFn)(true)).toEqual(mRet.one);
+		expect(mFlow.one).toHaveBeenCalledTimes(1);
+		expect(mFlow.two).toHaveBeenCalledTimes(0);
+
+		jest.clearAllMocks();
+
+		expect(await choose(choiceFn)(false)).toEqual(mRet.two);
+		expect(mFlow.one).toHaveBeenCalledTimes(0);
+		expect(mFlow.two).toHaveBeenCalledTimes(1);
+	});
+
+	test('"pass" should pass the items to the given flows.', async () => {
+		const items = [Symbol(), Symbol()];
+		const expectation = [[items[0]], [items[1]]];
+
+		expect(await pass(items, mFlow.one, mFlow.two)).toEqual(mRet.two);
+		expectMockCalls(mFlow.one)(expectation);
+		expectMockCalls(mFlow.two)(expectation);
+	});
 });
