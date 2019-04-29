@@ -4,7 +4,7 @@ describe('Functionality of the package.', () => {
 
 	/* Test Targets */
 	const { flow, forgive, flip, fail,
-		fork, fix, choose, pass, } = require('../src');
+		fork, fix, choose, feed, } = require('../src');
 
 	/* Helpers */
 	const succeed = () => true;
@@ -96,11 +96,11 @@ describe('Functionality of the package.', () => {
 		expect(mFlow.two).toHaveBeenCalledTimes(1);
 	});
 
-	test('"pass" should pass the items to the given flows.', async () => {
+	test('"feed" should feed the items to the given flows.', async () => {
 		const items = [Symbol(), Symbol()];
 		const expectation = [[items[0]], [items[1]]];
 
-		expect(await pass(items, mFlow.one, mFlow.two)).toEqual(mRet.two);
+		expect(await feed(items, mFlow.one, mFlow.two)).toEqual(mRet.two);
 		expectMockCalls(mFlow.one)(expectation);
 		expectMockCalls(mFlow.two)(expectation);
 	});

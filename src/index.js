@@ -28,7 +28,7 @@ const fix = (fn, ...flows) => async (data) => // Helps in intiiating recovery fl
 const choose = (choiceFn) => // Helps in choosing one among multiple flows, on the fly.
 	async (data) => await await choiceFn(data)(data);
 
-const pass = async (items, ...flows) => { // Helps in passing a list of items through a flow.
+const feed = async (items, ...flows) => { // Helps in passing a list of items through a flow.
 	let i = 0, l = items.length;
 	let lastReturnValue;
 
@@ -46,5 +46,5 @@ module.exports = {
 	fail,
 	fix,
 	choose,
-	pass,
+	feed,
 };

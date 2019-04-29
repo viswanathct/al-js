@@ -8,7 +8,7 @@
 
 ## Example
 ```js
-pass(Orders, flow(
+feed(Orders, flow(
 	verifyStock,
 	verifyPayment,
 	dispatch,
@@ -23,7 +23,7 @@ $ sh ./setup.sh
 
 ## Keys
 
-* Every input to a flow is passed to the functions sequentially.
+* Every input to a flow is fed to the functions sequentially.
 
 * Returning false from a function in a flow, affects the flow of the all downstream functions.
 
@@ -35,7 +35,7 @@ $ sh ./setup.sh
 
 * Assembly lines are similar to unix pipes, builder pattern and the pipe-filter pattern from functional languages. Yet, there are some key differentiators.
 
-	* Assembly lines pass the same entity to all the functions in a flow. They do not pass their return values downstream (like pipes / pipes-and-filters).
+	* Assembly lines feed the same entity to all the functions in a flow. They do not feed their return values downstream (like pipes / pipes-and-filters).
 
 	* Builder pattern has a specific purpose, building a complex object; where as assembly lines are meant to be a generic pattern in managing complex flows, which might include the building of complex objects.
 
