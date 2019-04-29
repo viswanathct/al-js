@@ -4,7 +4,7 @@ describe('Functionality of the package.', () => {
 
 	/* Test Targets */
 	const { flow, forgive, flip, fail,
-		fork, fix, choose, feed, } = require('../src');
+		fork, fix, follow, feed, } = require('../src');
 
 	/* Helpers */
 	const succeed = () => true;
@@ -82,16 +82,16 @@ describe('Functionality of the package.', () => {
 		expectMockCalls(mFlow.two)([[data]]);
 	});
 
-	test('"choose" should choose the flow based on the return value of the choiceFn.', async () => {
+	test('"follow" should follow the flow returned by the choiceFn.', async () => {
 		const choiceFn = (choice) => choice ? mFlow.one : mFlow.two;
 
-		expect(await choose(choiceFn)(true)).toEqual(mRet.one);
+		expect(await follow(choiceFn)(true)).toEqual(mRet.one);
 		expect(mFlow.one).toHaveBeenCalledTimes(1);
 		expect(mFlow.two).toHaveBeenCalledTimes(0);
 
 		jest.clearAllMocks();
 
-		expect(await choose(choiceFn)(false)).toEqual(mRet.two);
+		expect(await follow(choiceFn)(false)).toEqual(mRet.two);
 		expect(mFlow.one).toHaveBeenCalledTimes(0);
 		expect(mFlow.two).toHaveBeenCalledTimes(1);
 	});

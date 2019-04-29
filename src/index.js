@@ -25,7 +25,7 @@ const fork = (forkFn, defaultFlow, forkedFlow) => async (data) => // Helps in al
 const fix = (fn, ...flows) => async (data) => // Helps in intiiating recovery flows when a flow fails.
 	fn(data) === false ? await flow(...flows)(data) : undefined;
 
-const choose = (choiceFn) => // Helps in choosing one among multiple flows, on the fly.
+const follow = (choiceFn) => // Helps to switch to one among many flows, on the fly.
 	async (data) => await await choiceFn(data)(data);
 
 const feed = async (items, ...flows) => { // Helps in passing a list of items through a flow.
@@ -45,6 +45,6 @@ module.exports = {
 	flip,
 	fail,
 	fix,
-	choose,
+	follow,
 	feed,
 };
