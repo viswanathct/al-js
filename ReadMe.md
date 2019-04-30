@@ -1,39 +1,45 @@
 # Assembly Line a.k.a. ffffff
 
-  A simple set of utililties to help with building assembly lines in JS.
+	A simple set of utililties, to help with building assembly lines in JS.
 
-## Why?
+## The `Why`
 
 * Assembly lines help in implementing complex flows, in a manner -- easy to comprehend and maintain.
+* Considerably improves readability.
+* Allows for a hybrid-approach, by bringing together concepts from FP and Non-FP patterns.
 
 ## Example
 ```js
+/* Feed a list of Orders into a flow. */
 feed(Orders, flow(
 	verifyStock,
 	verifyPayment,
 	dispatch,
 	sendMail,
 ));
-```
 
-## Setup
+/* The is equivalent of the above, in plain JS, would be really messy. */
+```
+**For more examples, check the examples dir**.
+
+## Installation
 ```sh
-$ sh ./setup.sh
+$ npm install ffffff
 ```
 
 ## Keys
 
-* Every input to a flow is fed to the functions sequentially.
+* Simple functions are stiched together to compose complex flows.
 
-* Returning false from a function in a flow, affects the flow of the all downstream functions.
+* The same object is passed to all the functions in a flow, as the only argument.
 
-* The utilities could be combined to achieve complex flows.
+* Returning false from a function, affects the flow of the all downstream functions(there are ways to change the behaviour).
 
 ## Notes
 
 * The name flow, is a delibarate choice, to prevent confusing them with traditional pipes.
 
-* Assembly lines are similar to unix pipes, builder pattern and the pipe-filter pattern from functional languages. Yet, there are some key differentiators.
+* Assembly lines are similar to unix pipes, builder pattern and the pipe-filter pattern from functional languages. Yet, there are some key differentiators:
 
 	* Assembly lines feed the same entity to all the functions in a flow. They do not feed their return values downstream (like pipes / pipes-and-filters).
 
@@ -41,13 +47,22 @@ $ sh ./setup.sh
 
 * When a flow looks complex, break it into sub-flows.
 
-* The package name **ffffff** represents the primary utilitiy functions of the library. The lack of availability of the name -- **assembly-line**, **al-js** and their likes -- with NPM played a part in choosing such an odd name. There are a few more reasons to the name:
+* The package name **ffffff** represents the primary utilitiy functions of the library. The lack of availability of the name -- **assembly-line, al-js and their likes** -- with NPM played a part in choosing such an odd name. There are a few more reasons to the name:
 
 	* ***False** plays a key role in controling the flow.*
 
-	* The lib deals a lot with functions.
+	* The lib is all about functions.
+
+	* All the key functions start with the letter, **F**.
 
 	* *And **ffffff** is also the hex code of white.*
+
+# Development
+
+## Setup
+```sh
+$ sh ./setup.sh
+```
 
 ## ToDo
 
