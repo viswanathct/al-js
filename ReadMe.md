@@ -20,12 +20,24 @@ feed(Orders, flow(
 
 /* The is equivalent of the above, in plain JS, would be really messy. */
 ```
-**For more examples, check the examples dir**.
+**For more examples, check the [examples](https://github.com/viswanathct/al-js/tree/master/examples) dir**.
+```sh
+# Or run
+$ node ./examples/cheatsheet.js
+```
 
 ## Installation
 ```sh
 $ npm install ffffff
 ```
+
+## Use Cases
+
+* Data pipelines.
+
+* Asset pipelines.
+
+* Complex business flows.
 
 ## Keys
 
@@ -70,6 +82,10 @@ $ sh ./setup.sh
 
 * Write some examples and include a few of them in the ReadMe.
 
-* Add some example bots. Especially a batcher and a timer.
+* Add some example bots. Especially, a batcher, a timer and an apiFetcher.
 
 * Port the package to other languages, esp. to Python.
+
+* If possible, write tests for the cheatsheet example.
+
+* Document the API.
