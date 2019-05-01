@@ -10,19 +10,17 @@
 
 ## Example
 ```js
-/* Feed a list of Orders into a flow. */
+/* Process a list of orders with a flow. */
 feed(Orders, flow(
 	verifyStock,
 	verifyPayment,
 	dispatch,
 	sendMail,
 ));
-
-/* The is equivalent of the above, in plain JS, would be really messy. */
 ```
 **For more examples, check the [examples](https://github.com/viswanathct/al-js/tree/master/examples) dir**.
 ```sh
-# Or run
+# Or run the following (with node v8+):
 $ node ./examples/cheatsheet.js
 ```
 
@@ -37,7 +35,7 @@ $ npm install ffffff
 
 * Asset pipelines.
 
-* Complex business flows.
+* Complex and ever-changing business flows.
 
 ## Keys
 
@@ -45,7 +43,7 @@ $ npm install ffffff
 
 * The same object is passed to all the functions in a flow, as the only argument.
 
-* Returning false from a function, affects the flow of the all downstream functions(there are ways to change the behaviour).
+* Returning false from a function, affects the flow of the all downstream functions. Utility functions help in deciding on, how the flow is affected.
 
 ## Notes
 
@@ -58,6 +56,8 @@ $ npm install ffffff
 	* Builder pattern has a specific purpose, building a complex object; where as assembly lines are meant to be a generic pattern in managing complex flows, which might include the building of complex objects.
 
 * When a flow looks complex, break it into sub-flows.
+
+* The library doesn't have any dependencies.
 
 * The package name **ffffff** represents the primary utilitiy functions of the library. The lack of availability of the name -- **assembly-line, al-js and their likes** -- with NPM played a part in choosing such an odd name. There are a few more reasons to the name:
 
