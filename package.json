@@ -19,6 +19,10 @@
     "unix-pipes",
     "builder-pattern"
   ],
+  "engines" : {
+    "node" : ">=7.6"
+  },
+  "engineStrict" : true,
   "author": "Viswanath. Ct",
   "license": "ISC",
   "bugs": {
