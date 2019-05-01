@@ -22,6 +22,7 @@ const orders = [
 		quantity: 10,
 	},
 ];
+const reversedOrders = orders.slice(0).reverse()
 const stock = {
 	shoes: 10,
 	apples: 5,
@@ -39,7 +40,7 @@ const calculateTotal = (order) => {
 	order.total = order.quantity * order.price;
 }
 const dispatchProduct = (order) => log(`Dispatching ${order.quantity} ${order.product}.`)
-const doNothing = () => {};
+const doNothing = () => log('Doing nothing!');
 
 /* Examples */
 const examples = {
@@ -92,17 +93,15 @@ const examples = {
 	},
 
 	'A flow with a flip': async () => {
-		const reversedOrders = orders.reverse();
-
 		await feed(reversedOrders, flow(
-			flip(verifyStock), //Fix excpects a failure to proceed. This is partly due to to help while leveraging third-party functions.
+			flip(verifyStock), //Fix expects a failure to proceed. This is partly due to to help while leveraging third-party functions.
 			procureProduct,
 		));
 	},
 
 	'A flow with a fail': async () => {
 
-		await feed(orders, flow(
+		await feed(reversedOrders, flow(
 			fix(verifyStock, procureProduct, fail), // Fails stops the flow. The fucntion is a syntactic-sugar, as well as an aid to improve readability.
 			calculateTotal,
 			dispatchProduct,
