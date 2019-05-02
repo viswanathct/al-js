@@ -1,6 +1,6 @@
 {
   "name": "ffffff",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A simple set of utilities to help with building assembly lines in JS.",
   "main": "./src/index.js",
   "scripts": {
@@ -19,10 +19,10 @@
     "unix-pipes",
     "builder-pattern"
   ],
-  "engines" : {
-    "node" : ">=7.6"
+  "engines": {
+    "node": ">=7.6"
   },
-  "engineStrict" : true,
+  "engineStrict": true,
   "author": "Viswanath. Ct",
   "license": "ISC",
   "bugs": {
