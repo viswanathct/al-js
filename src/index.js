@@ -19,8 +19,8 @@ const flip = (...flows) => // Expects a failure to coninue the flow. Helps in in
 
 const fail = () => false; // Syntactic sugar, used to signify a break in the flow.
 
-const fork = (forkFn, defaultFlow, forkedFlow) => async (data) => // Helps in altering between two flows.
-	await (await forkFn(data) === false ? forkedFlow : defaultFlow)(data);
+const fork = (forker, defaultFlow, forkedFlow) => async (data) => // Helps in altering between two flows.
+	await (await forker(data) === false ? (forkedFlow && forkedFlow(data)) : defaultFlow(data));
 
 const fix = (fn, ...flows) => async (data) => // Helps in intiiating recovery flows when a flow fails.
 	fn(data) === false ? await flow(...flows)(data) : undefined;

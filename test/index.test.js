@@ -51,21 +51,29 @@ describe('Functionality of the package.', () => {
 	test('"fork" should continue with the default-flow, when the forkerFn succeeds.', async () => {
 		const defaultFlow = mFlow.one;
 		const defaultRet = mRet.one;
-		const forkedFlow = mFlow.two;
+		const altFlow = mFlow.two;
 
-		expect(await fork(succeed, defaultFlow, forkedFlow)(data)).toEqual(defaultRet);
+		expect(await fork(succeed, defaultFlow, altFlow)(data)).toEqual(defaultRet);
 		expectMockCalls(defaultFlow)([[data]]);
-		expectMockCalls(forkedFlow)([]);
+		expectMockCalls(altFlow)([]);
 	});
 
-	test('"fork" should continue with the forked-flow, when the forkerFn fails.', async () => {
+	test('"fork" should continue with the alt-flow, when the forkerFn fails.', async () => {
 		const defaultFlow = mFlow.one;
-		const forkedFlow = mFlow.two;
-		const forkedRet = mRet.two;
+		const altFlow = mFlow.two;
+		const altRet = mRet.two;
 
-		expect(await fork(fail, defaultFlow, forkedFlow)(data)).toEqual(forkedRet);
+		expect(await fork(fail, defaultFlow, altFlow)(data)).toEqual(altRet);
 		expectMockCalls(defaultFlow)([]);
-		expectMockCalls(forkedFlow)([[data]]);
+		expectMockCalls(altFlow)([[data]]);
+	});
+
+	test('"fork" should work without an alt-flow.', async () => {
+		const defaultFlow = mFlow.one;
+		const defaultRet = mRet.one;
+
+		expect(await fork(succeed, defaultFlow)(data)).toEqual(defaultRet);
+		expectMockCalls(defaultFlow)([[data]]);
 	});
 
 	test('"fix" should not continue with the "resolving flow" when the fixed-function succeeds.', async () => {
