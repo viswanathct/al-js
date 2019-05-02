@@ -7,14 +7,15 @@ describe('Functionality of the package.', () => {
 		fork, fix, follow, feed, } = require('../src');
 
 	/* Helpers */
-	const succeed = () => true;
+	const asyncSucceed = async () => true;
+	const asyncFail = async () => false;
 
 	/* Mocks */
 	const data = Symbol();
 	const mRet = { one: Symbol(), two: Symbol() };
 	const mFlow = {
-		one: jest.fn().mockReturnValue(mRet.one),
-		two: jest.fn().mockReturnValue(mRet.two),
+		one: jest.fn().mockImplementation(() => Promise.resolve(mRet.one)),
+		two: jest.fn().mockImplementation(() => Promise.resolve(mRet.two)),
 	};
 
 	/* Setup */
@@ -28,19 +29,19 @@ describe('Functionality of the package.', () => {
 	});
 
 	test('"flow" should stop and return false when a sub-flow fails.', async () => {
-		expect(await flow(mFlow.one, fail, mFlow.two)(data)).toEqual(false);
+		expect(await flow(mFlow.one, asyncFail, mFlow.two)(data)).toEqual(false);
 		expectMockCalls(mFlow.one)([[data]]);
 		expectMockCalls(mFlow.two)([]);
 	});
 
 	test('"forgive" should negate failures.', async () => {
-		expect(await forgive(fail)()).toEqual(undefined);
-		expect(await forgive(succeed)()).toEqual(true);
+		expect(await forgive(asyncFail)()).toEqual(undefined);
+		expect(await forgive(asyncSucceed)()).toEqual(true);
 	});
 
 	test('"flip" should negate bot successes and failures.', async () => {
-		expect(await flip(fail)()).toEqual(undefined);
-		expect(await flip(succeed)()).toEqual(false);
+		expect(await flip(asyncFail)()).toEqual(undefined);
+		expect(await flip(asyncSucceed)()).toEqual(false);
 	});
 
 	test('"fail" should return false, to break the flow.', () => {
@@ -53,7 +54,7 @@ describe('Functionality of the package.', () => {
 		const defaultRet = mRet.one;
 		const altFlow = mFlow.two;
 
-		expect(await fork(succeed, defaultFlow, altFlow)(data)).toEqual(defaultRet);
+		expect(await fork(asyncSucceed, defaultFlow, altFlow)(data)).toEqual(defaultRet);
 		expectMockCalls(defaultFlow)([[data]]);
 		expectMockCalls(altFlow)([]);
 	});
@@ -63,7 +64,7 @@ describe('Functionality of the package.', () => {
 		const altFlow = mFlow.two;
 		const altRet = mRet.two;
 
-		expect(await fork(fail, defaultFlow, altFlow)(data)).toEqual(altRet);
+		expect(await fork(asyncFail, defaultFlow, altFlow)(data)).toEqual(altRet);
 		expectMockCalls(defaultFlow)([]);
 		expectMockCalls(altFlow)([[data]]);
 	});
@@ -72,12 +73,12 @@ describe('Functionality of the package.', () => {
 		const defaultFlow = mFlow.one;
 		const defaultRet = mRet.one;
 
-		expect(await fork(succeed, defaultFlow)(data)).toEqual(defaultRet);
+		expect(await fork(asyncSucceed, defaultFlow)(data)).toEqual(defaultRet);
 		expectMockCalls(defaultFlow)([[data]]);
 	});
 
 	test('"fix" should not continue with the "resolving flow" when the fixed-function succeeds.', async () => {
-		const fixedFn = succeed;
+		const fixedFn = asyncSucceed;
 		const resolvingFlow = mFlow.one;
 
 		expect(await fix(fixedFn, resolvingFlow)(data)).toEqual(undefined);
@@ -85,7 +86,7 @@ describe('Functionality of the package.', () => {
 	});
 
 	test('"fix" should invoke the "resolving flow" when the fixed-function fails.', async () => {
-		expect(await fix(fail, mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
+		expect(await fix(asyncFail, mFlow.one, mFlow.two)(data)).toEqual(mRet.two);
 		expectMockCalls(mFlow.one)([[data]]);
 		expectMockCalls(mFlow.two)([[data]]);
 	});
