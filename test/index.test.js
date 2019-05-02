@@ -1,4 +1,4 @@
-const { testMembers, expectMockCalls } = require("./helpers");
+const { expectMockCalls } = require("./helpers");
 
 describe('Functionality of the package.', () => {
 
