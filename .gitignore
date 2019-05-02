@@ -4,6 +4,7 @@
 
 ## Stack
 node_modules
+/*.tgz
 
 # Excludes
 ## General
