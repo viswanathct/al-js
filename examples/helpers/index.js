@@ -16,7 +16,7 @@ const log = (x) => logs.push(`\t${x}`);
 const runExamples = (examples, speed = 200) => call(async () => {
 	const exampleNames = keys(examples);
 	const count = exampleNames.length;
-	let i =0;
+	let i = 0;
 
 	while(i < count) {
 		const exampleName = exampleNames[i++];
